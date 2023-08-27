@@ -1,7 +1,10 @@
 const { toXY } = require("./XyConvert");
 const axios = require("axios");
 const Redis = require("ioredis");
-const moment = require("moment");
+require("moment-timezone");
+var moment = require("moment");
+moment.tz.setDefault("Asia/Seoul");
+
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const redis = new Redis({
@@ -11,7 +14,7 @@ const redis = new Redis({
 
 module.exports = async (req, res) => {
   console.log("NowWeather.js 서버");
-
+  // console.log(moment);
   const getTodayDate = () => {
     let today = new Date(Date.now() - 45 * 60 * 1000);
     let yyyy = today.getFullYear().toString();
@@ -19,18 +22,27 @@ module.exports = async (req, res) => {
     mm = mm < 10 ? "0" + mm.toString() : mm.toString();
     let dd = today.getDate();
     dd = dd < 10 ? "0" + dd.toString() : dd.toString();
+    console.log(dd);
+    if (moment().format("HH") == "00") {
+      return yyyy + mm + (today.getDate() - 1);
+    }
     return yyyy + mm + dd;
   };
 
   //초단기예보시간 - 예보시간은 각 30분, api제공시간은 45분
   const getBaseTime = () => {
-    const currentTime = moment();
+    // let hourDate = new Date(Date.now() - 45 * 60 * 1000);
+    // const currentTime = moment();
+    var currentTime = moment();
+    console.log("현재 시간:", currentTime.format("HH"));
     const oneHourAgo = currentTime.subtract(1, "hour");
     let formattedOneHourAgo = oneHourAgo.format("HH");
-    formattedOneHourAgo =
-      formattedOneHourAgo >= 10
-        ? formattedOneHourAgo
-        : "0" + formattedOneHourAgo;
+    console.log("현재 시간2:", formattedOneHourAgo);
+    // let hour = moment().format("HH")
+    // formattedOneHourAgo =
+    //   formattedOneHourAgo >= 10
+    //     ? formattedOneHourAgo
+    //     : "0" + formattedOneHourAgo;
     return formattedOneHourAgo + "" + "30";
   };
   console.log(getBaseTime());
