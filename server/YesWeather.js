@@ -9,14 +9,14 @@ const redis = new Redis({
 });
 
 module.exports = async (req, res) => {
-  console.log("YesWeather.js 서버");
+  console.log("NowWeather.js 서버");
 
-  const getYesterdayDate = () => {
-    let yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000 - 45 * 60 * 1000);
-    let yyyy = yesterday.getFullYear().toString();
-    let mm = yesterday.getMonth() + 1;
+  const getTodayDate = () => {
+    let today = new Date(Date.now() - 45 * 60 * 1000);
+    let yyyy = today.getFullYear().toString();
+    let mm = today.getMonth() + 1;
     mm = mm < 10 ? "0" + mm.toString() : mm.toString();
-    let dd = yesterday.getDate();
+    let dd = today.getDate();
     dd = dd < 10 ? "0" + dd.toString() : dd.toString();
     return yyyy + mm + dd;
   };
@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
     "&dataType=" +
     "json" +
     "&base_date=" +
-    getYesterdayDate() +
+    getTodayDate() +
     "&base_time=" +
     getBaseTime() +
     "&nx=" +
@@ -52,22 +52,26 @@ module.exports = async (req, res) => {
     "&ny=" +
     toXYconvert.y;
 
-  const cacheKey = `${lat}-${lon}-${getYesterdayDate()}-${getBaseTime()}`;
+  const cacheKey = `${lat}-${lon}-${getTodayDate()}-${getBaseTime()}`;
 
   try {
+    // Redis에서 캐시된 데이터 조회
     const cachedData = await redis.get(cacheKey);
 
     if (cachedData) {
+      // 캐시된 데이터 반환
       res.send(JSON.parse(cachedData));
     } else {
+      // 캐시된 데이터가 없는 경우 API 호출 후 데이터 캐싱
       const response = await axios.get(apiUrl);
 
-      const selectedFields = fields || ["T1H"];
+      const selectedFields = fields || ["T1H", "SKY", "PTY"];
       const selectedItems = response.data.response.body.items.item.filter(
         (item) => selectedFields.includes(item.category)
       );
 
-      await redis.setex(cacheKey, 86400, JSON.stringify(selectedItems)); // 유효시간: 24시간
+      // 캐시 데이터를 Redis에 저장 (유효기간: 45분)
+      await redis.setex(cacheKey, 2700, JSON.stringify(selectedItems));
 
       res.send(selectedItems);
     }
@@ -79,15 +83,15 @@ module.exports = async (req, res) => {
   // axios
   //   .get(apiUrl)
   //   .then((response) => {
-  //     const selectedFields = fields || ["T1H"]; // 기본 필드 설정
+  //     const selectedFields = fields || ["T1H", "SKY", "PTY"]; // 기본 필드 설정
   //     const selectedItems = response.data.response.body.items.item.filter(
   //       (item) => selectedFields.includes(item.category)
   //     );
-
-  //     res.send(selectedItems);
   //     // console.log(response.data);
   //     // console.log(response.data.response.body);
   //     // console.log(response.data.response.body.items.item);
+  //     // res.send(response.data.response.body.items.item);
+  //     res.send(selectedItems);
   //   })
   //   .catch((error) => {
   //     console.error(error);
