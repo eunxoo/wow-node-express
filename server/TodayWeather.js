@@ -43,8 +43,7 @@ module.exports = async (req, res) => {
   const toXYconvert = toXY(lat, lon);
 
   const url = `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst`;
-  const SERVICE_KEY =
-    "RSDUo%2F0cItbh7%2BcVxTEXEsk7LwF5pQx%2FOV%2F01Jvv3Y1F4%2FUNvQAR%2BcSzl29QAKD3l%2Bv3KR7f86b5MPQ%2FCE834A%3D%3D";
+  const SERVICE_KEY = process.env.OPENAPI_KEY;
   console.log(req.body);
   const apiUrl =
     url +
