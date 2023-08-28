@@ -16,8 +16,7 @@ module.exports = async (req, res) => {
   try {
     const addressInfo = await ConvertToAddress(lat, lon);
     const url = `http://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty`;
-    const SERVICE_KEY =
-      "RSDUo%2F0cItbh7%2BcVxTEXEsk7LwF5pQx%2FOV%2F01Jvv3Y1F4%2FUNvQAR%2BcSzl29QAKD3l%2Bv3KR7f86b5MPQ%2FCE834A%3D%3D";
+    const SERVICE_KEY = process.env.OPENAPI_KEY;
 
     const apiUrl =
       url +
