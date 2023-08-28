@@ -1,6 +1,9 @@
 const { toXY } = require("./XyConvert");
 const axios = require("axios");
 const Redis = require("ioredis");
+require("moment-timezone");
+var moment = require("moment");
+moment.tz.setDefault("Asia/Seoul");
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const redis = new Redis({
@@ -22,13 +25,16 @@ module.exports = async (req, res) => {
   };
 
   const getBaseTime = () => {
-    const currentHour = new Date().getHours();
+    // const currentHour = new Date().getHours();
+    var currentTime = moment();
+    currentTime = currentTime.format("H");
+    console.log("현재 시간:", currentTime);
     const baseTimes = [2, 5, 8, 11, 14, 17, 20, 23];
 
     // Find the nearest previous base time
     let previousBaseTime = baseTimes[0];
     for (let i = baseTimes.length - 1; i >= 0; i--) {
-      if (currentHour >= baseTimes[i]) {
+      if (currentTime >= baseTimes[i]) {
         previousBaseTime = baseTimes[i];
         break;
       }
@@ -80,8 +86,8 @@ module.exports = async (req, res) => {
         (item) => selectedFields.includes(item.category)
       );
 
-      // 캐시 데이터를 Redis에 저장 (유효기간: 24시간)
-      await redis.setex(cacheKey, 24 * 60 * 60, JSON.stringify(selectedItems));
+      // 캐시 데이터를 Redis에 저장 (유효기간: 3시간)
+      await redis.setex(cacheKey, 3 * 60 * 60, JSON.stringify(selectedItems));
       res.send(selectedItems);
     }
   } catch (error) {

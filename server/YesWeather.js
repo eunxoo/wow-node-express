@@ -1,6 +1,9 @@
 const { toXY } = require("./XyConvert");
 const axios = require("axios");
 const Redis = require("ioredis");
+require("moment-timezone");
+var moment = require("moment");
+moment.tz.setDefault("Asia/Seoul");
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const redis = new Redis({
@@ -23,10 +26,13 @@ module.exports = async (req, res) => {
 
   //초단기예보시간 - 예보시간은 각 30분, api제공시간은 45분
   const getBaseTime = () => {
-    let hourDate = new Date(Date.now() - 45 * 60 * 1000);
-    let hour = hourDate.getHours();
-    hour = hour >= 10 ? hour : "0" + hour;
-    return hour + "" + "30";
+    // let hourDate = new Date(Date.now() - 45 * 60 * 1000);
+    // let hour = hourDate.getHours();
+    var currentTime = moment().format("H");
+    console.log("현재 시간:", currentTime);
+
+    currentTime = currentTime >= 10 ? currentTime : "0" + currentTime;
+    return currentTime + "" + "30";
   };
 
   const { lat, lon, fields } = req.body;

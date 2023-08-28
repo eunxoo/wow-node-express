@@ -4,7 +4,6 @@ const Redis = require("ioredis");
 require("moment-timezone");
 var moment = require("moment");
 moment.tz.setDefault("Asia/Seoul");
-
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const redis = new Redis({
