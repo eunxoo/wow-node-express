@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
     hour = hour >= 10 ? hour : "0" + hour;
     return hour + "" + "30";
   };
-
+  console.log(getBaseTime());
   const { lat, lon, fields } = req.body;
   const toXYconvert = toXY(lat, lon);
 
