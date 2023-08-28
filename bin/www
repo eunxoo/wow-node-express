@@ -19,7 +19,7 @@ app.use(
   })
 );
 
-app.post("/api/nowweather", NowWeather);
+app.post("/nowweather", NowWeather);
 app.post("/api/todayweather", TodayWeather);
 app.post("/api/yesweather", YesWeather);
 app.post("/api/tomorrowweather", TomorrowWeather);
