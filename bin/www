@@ -20,7 +20,7 @@ app.use(
 );
 
 app.post("/nowweather", NowWeather);
-app.post("/api/todayweather", TodayWeather);
+app.post("/todayweather", TodayWeather);
 app.post("/api/yesweather", YesWeather);
 app.post("/api/tomorrowweather", TomorrowWeather);
 app.get("/api/convert", AddressConvert);
