@@ -1,5 +1,5 @@
 const axios = require("axios");
-require("dotenv").config({ path: "/Users/eunsoo/Desktop/WowWeather/.env" });
+require("dotenv").config({ path: __dirname + "/../.env" });
 
 // 좌표를 주소로 변환하는 함수
 const ConvertToAddress = async (latitude, longitude) => {

@@ -1,5 +1,5 @@
 const axios = require("axios");
-require("dotenv").config({ path: "/Users/eunsoo/Desktop/WowWeather/.env" });
+require("dotenv").config({ path: __dirname + "/../.env" });
 const ConvertToAddress = require("./ConvertToAddress");
 
 // /convert 엔드포인트의 핸들러 함수

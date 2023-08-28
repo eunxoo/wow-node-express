@@ -1,6 +1,6 @@
 const axios = require("axios");
 const Redis = require("ioredis");
-require("dotenv").config({ path: "/Users/eunsoo/Desktop/WowWeather/.env" });
+require("dotenv").config({ path: __dirname + "/../.env" });
 const ConvertToAddress = require("./ConvertToAddress");
 
 const redis = new Redis({
