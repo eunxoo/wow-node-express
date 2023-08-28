@@ -19,12 +19,12 @@ app.use(
   })
 );
 
-app.post("/nowweather", NowWeather);
-app.post("/todayweather", TodayWeather);
-app.post("/yesweather", YesWeather);
-app.post("/tomorrowweather", TomorrowWeather);
-app.get("/convert", AddressConvert);
-app.post("/nowdust", DustWeather);
+app.post("/api/nowweather", NowWeather);
+app.post("/api/todayweather", TodayWeather);
+app.post("/api/yesweather", YesWeather);
+app.post("/api/tomorrowweather", TomorrowWeather);
+app.get("/api/convert", AddressConvert);
+app.post("/api/nowdust", DustWeather);
 
 app.listen(PORT, () => {
   console.log(`server running on PORT ${PORT}`);
