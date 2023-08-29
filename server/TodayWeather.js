@@ -14,30 +14,38 @@ const redis = new Redis({
 module.exports = async (req, res) => {
   console.log("TodayWeather.js 서버");
 
-  const getYesterdayDate = () => {
-    let yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
-    let yyyy = yesterday.getFullYear().toString();
-    let mm = yesterday.getMonth() + 1;
+  const getTodayDate = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear().toString();
+    let mm = today.getMonth() + 1;
     mm = mm < 10 ? "0" + mm.toString() : mm.toString();
-    let dd = yesterday.getDate();
+    let dd = today.getDate();
     dd = dd < 10 ? "0" + dd.toString() : dd.toString();
+    let hour = moment().hour();
+    if (hour < 2) {
+      const yesterday = moment().subtract(1, "days");
+      return yesterday.format("YYYYMMDD");
+    }
     return yyyy + mm + dd;
   };
 
   const getBaseTime = () => {
     // const currentHour = new Date().getHours();
-    var currentTime = moment();
-    currentTime = currentTime.format("H");
-    console.log("현재 시간:", currentTime);
+    let currentHour = moment().hour();
+    console.log("현재 시간2:", currentHour);
     const baseTimes = [2, 5, 8, 11, 14, 17, 20, 23];
 
     // Find the nearest previous base time
     let previousBaseTime = baseTimes[0];
     for (let i = baseTimes.length - 1; i >= 0; i--) {
-      if (currentTime >= baseTimes[i]) {
+      if (currentHour >= baseTimes[i]) {
         previousBaseTime = baseTimes[i];
         break;
       }
+    }
+
+    if (currentHour < 2) {
+      return "2300";
     }
 
     return previousBaseTime < 10
@@ -47,7 +55,8 @@ module.exports = async (req, res) => {
 
   const { lat, lon, fields } = req.body;
   const toXYconvert = toXY(lat, lon);
-
+  console.log(getTodayDate());
+  console.log(getBaseTime());
   const url = `http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst`;
   const SERVICE_KEY = process.env.OPENAPI_KEY;
   console.log(req.body);
@@ -60,7 +69,7 @@ module.exports = async (req, res) => {
     "&dataType=" +
     "json" +
     "&base_date=" +
-    getYesterdayDate() +
+    getTodayDate() +
     "&base_time=" +
     getBaseTime() +
     "&nx=" +
@@ -68,7 +77,7 @@ module.exports = async (req, res) => {
     "&ny=" +
     toXYconvert.y;
 
-  const cacheKey = `${lat}-${lon}-${getYesterdayDate()}-2300`;
+  const cacheKey = `${lat}-${lon}-${getTodayDate()}-2300`;
 
   try {
     // Redis에서 캐시된 데이터 조회
