@@ -38,6 +38,9 @@ module.exports = async (req, res) => {
     const oneHourAgo = currentTime.subtract(1, "hour");
     let formattedOneHourAgo = oneHourAgo.format("HH");
     console.log("현재 시간2:", formattedOneHourAgo);
+    if (currentTime.minute() <= 15) {
+      return formattedOneHourAgo + "" + "00";
+    }
     return formattedOneHourAgo + "" + "30";
   };
   console.log(getBaseTime());
@@ -63,7 +66,7 @@ module.exports = async (req, res) => {
     toXYconvert.x +
     "&ny=" +
     toXYconvert.y;
-
+  console.log(apiUrl);
   const cacheKey = `${lat}-${lon}-${getTodayDate()}-${getBaseTime()}`;
 
   try {
