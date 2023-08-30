@@ -98,13 +98,9 @@ module.exports = async (req, res) => {
     } else {
       // 캐시된 데이터가 없는 경우 API 호출 후 데이터 캐싱
       const response = await axios.get(apiUrl);
-      const currentTime = moment().format("HH00");
-      console.log("currentTime" + currentTime);
       const selectedFields = fields || ["TMN", "TMX", "TMP", "SKY", "PTY"];
       const selectedItems = response.data.response.body.items.item.filter(
-        (item) =>
-          selectedFields.includes(item.category) &&
-          parseInt(item.fcstTime) >= parseInt(currentTime)
+        (item) => selectedFields.includes(item.category)
       );
 
       // 캐시 데이터를 Redis에 저장 (유효기간: 3시간)
