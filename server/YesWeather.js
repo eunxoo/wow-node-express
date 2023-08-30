@@ -15,24 +15,28 @@ module.exports = async (req, res) => {
   console.log("YesWeather.js 서버");
 
   const getYesterdayDate = () => {
-    let yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000 - 45 * 60 * 1000);
-    let yyyy = yesterday.getFullYear().toString();
-    let mm = yesterday.getMonth() + 1;
-    mm = mm < 10 ? "0" + mm.toString() : mm.toString();
-    let dd = yesterday.getDate();
-    dd = dd < 10 ? "0" + dd.toString() : dd.toString();
-    return yyyy + mm + dd;
+    // let yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000 - 45 * 60 * 1000);
+    // let yyyy = yesterday.getFullYear().toString();
+    // let mm = yesterday.getMonth() + 1;
+    // mm = mm < 10 ? "0" + mm.toString() : mm.toString();
+    // let dd = yesterday.getDate();
+    // dd = dd < 10 ? "0" + dd.toString() : dd.toString();
+    // return yyyy + mm + dd;
+    const yesterday = moment().subtract(1, "days");
+    if (moment().hour() === 0) {
+      return moment(yesterday).subtract(1, "days").format("YYYYMMDD");
+    }
+    return yesterday.format("YYYYMMDD");
   };
 
   //초단기예보시간 - 예보시간은 각 30분, api제공시간은 45분
   const getBaseTime = () => {
-    // let hourDate = new Date(Date.now() - 45 * 60 * 1000);
-    // let hour = hourDate.getHours();
-    var currentTime = moment().format("H");
-    console.log("현재 시간:", currentTime);
-
-    currentTime = currentTime >= 10 ? currentTime : "0" + currentTime;
-    return currentTime + "" + "30";
+    var currentTime = moment();
+    console.log("현재 시간:", currentTime.format("HH"));
+    const oneHourAgo = currentTime.subtract(1, "hour");
+    let formattedOneHourAgo = oneHourAgo.format("HH");
+    console.log("현재 시간2:", formattedOneHourAgo);
+    return formattedOneHourAgo + "" + "30";
   };
 
   const { lat, lon, fields } = req.body;
@@ -57,7 +61,7 @@ module.exports = async (req, res) => {
     toXYconvert.x +
     "&ny=" +
     toXYconvert.y;
-
+  console.log(apiUrl);
   const cacheKey = `${lat}-${lon}-${getYesterdayDate()}-${getBaseTime()}`;
 
   try {

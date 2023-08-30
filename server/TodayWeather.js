@@ -15,18 +15,27 @@ module.exports = async (req, res) => {
   console.log("TodayWeather.js 서버");
 
   const getTodayDate = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear().toString();
-    let mm = today.getMonth() + 1;
-    mm = mm < 10 ? "0" + mm.toString() : mm.toString();
-    let dd = today.getDate();
-    dd = dd < 10 ? "0" + dd.toString() : dd.toString();
-    let hour = moment().hour();
+    // const today = new Date();
+    // const yyyy = today.getFullYear().toString();
+    // let mm = today.getMonth() + 1;
+    // mm = mm < 10 ? "0" + mm.toString() : mm.toString();
+    // let dd = today.getDate();
+    // dd = dd < 10 ? "0" + dd.toString() : dd.toString();
+    // let hour = moment().hour();
+    // if (hour < 2) {
+    //   const yesterday = moment().subtract(1, "days");
+    //   return yesterday.format("YYYYMMDD");
+    // }
+    // return yyyy + mm + dd;
+    const today = moment();
+    const hour = today.hour();
+
     if (hour < 2) {
       const yesterday = moment().subtract(1, "days");
       return yesterday.format("YYYYMMDD");
     }
-    return yyyy + mm + dd;
+
+    return today.format("YYYYMMDD");
   };
 
   const getBaseTime = () => {
@@ -76,8 +85,8 @@ module.exports = async (req, res) => {
     toXYconvert.x +
     "&ny=" +
     toXYconvert.y;
-
-  const cacheKey = `${lat}-${lon}-${getTodayDate()}-2300`;
+  // console.log(apiUrl);
+  const cacheKey = `${lat}-${lon}-${getTodayDate()}-${getBaseTime()}`;
 
   try {
     // Redis에서 캐시된 데이터 조회

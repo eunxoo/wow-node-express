@@ -1,6 +1,9 @@
 const { toXY } = require("./XyConvert");
 const axios = require("axios");
 const Redis = require("ioredis");
+require("moment-timezone");
+var moment = require("moment");
+moment.tz.setDefault("Asia/Seoul");
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const redis = new Redis({
@@ -10,6 +13,30 @@ const redis = new Redis({
 
 module.exports = async (req, res) => {
   console.log("TomorrowWeather.js 서버");
+
+  const getTodayDate = () => {
+    // const today = new Date();
+    // const yyyy = today.getFullYear().toString();
+    // let mm = today.getMonth() + 1;
+    // mm = mm < 10 ? "0" + mm.toString() : mm.toString();
+    // let dd = today.getDate();
+    // dd = dd < 10 ? "0" + dd.toString() : dd.toString();
+    // let hour = moment().hour();
+    // if (hour < 2) {
+    //   const yesterday = moment().subtract(1, "days");
+    //   return yesterday.format("YYYYMMDD");
+    // }
+    // return yyyy + mm + dd;
+    const today = moment();
+    const hour = today.hour();
+
+    if (hour < 2) {
+      const yesterday = moment().subtract(1, "days");
+      return yesterday.format("YYYYMMDD");
+    }
+
+    return today.format("YYYYMMDD");
+  };
 
   const getYesterdayDate = () => {
     let yesterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
@@ -22,13 +49,42 @@ module.exports = async (req, res) => {
   };
 
   const getTomorrowDate = () => {
-    let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-    let yyyy = tomorrow.getFullYear().toString();
-    let mm = tomorrow.getMonth() + 1;
-    mm = mm < 10 ? "0" + mm.toString() : mm.toString();
-    let dd = tomorrow.getDate();
-    dd = dd < 10 ? "0" + dd.toString() : dd.toString();
-    return yyyy + mm + dd;
+    const tomorrow = moment().add(1, "days");
+    return tomorrow.format("YYYYMMDD");
+  };
+
+  // const getTomorrowDate = () => {
+  //   let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+  //   let yyyy = tomorrow.getFullYear().toString();
+  //   let mm = tomorrow.getMonth() + 1;
+  //   mm = mm < 10 ? "0" + mm.toString() : mm.toString();
+  //   let dd = tomorrow.getDate();
+  //   dd = dd < 10 ? "0" + dd.toString() : dd.toString();
+  //   return yyyy + mm + dd;
+  // };
+
+  const getBaseTime = () => {
+    // const currentHour = new Date().getHours();
+    let currentHour = moment().hour();
+    console.log("현재 시간2:", currentHour);
+    const baseTimes = [2, 5, 8, 11, 14, 17, 20, 23];
+
+    // Find the nearest previous base time
+    let previousBaseTime = baseTimes[0];
+    for (let i = baseTimes.length - 1; i >= 0; i--) {
+      if (currentHour >= baseTimes[i]) {
+        previousBaseTime = baseTimes[i];
+        break;
+      }
+    }
+
+    if (currentHour < 2) {
+      return "2300";
+    }
+
+    return previousBaseTime < 10
+      ? "0" + previousBaseTime + "00"
+      : previousBaseTime + "00";
   };
 
   const { lat, lon, fields } = req.body;
@@ -46,15 +102,15 @@ module.exports = async (req, res) => {
     "&dataType=" +
     "json" +
     "&base_date=" +
-    getYesterdayDate() +
+    getTodayDate() +
     "&base_time=" +
-    "2300" +
+    getBaseTime() +
     "&nx=" +
     toXYconvert.x +
     "&ny=" +
     toXYconvert.y;
-
-  const cacheKey = `${lat}-${lon}-${getYesterdayDate()}-2300`;
+  console.log(apiUrl);
+  const cacheKey = `${lat}-${lon}-${getTodayDate()}-${getBaseTime()}`;
 
   try {
     const cachedData = await redis.get(cacheKey);

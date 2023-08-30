@@ -4,6 +4,7 @@ const Redis = require("ioredis");
 require("moment-timezone");
 var moment = require("moment");
 moment.tz.setDefault("Asia/Seoul");
+
 require("dotenv").config({ path: __dirname + "/../.env" });
 
 const redis = new Redis({
@@ -15,33 +16,28 @@ module.exports = async (req, res) => {
   console.log("NowWeather.js 서버");
   // console.log(moment);
   const getTodayDate = () => {
-    let today = new Date(Date.now() - 45 * 60 * 1000);
-    let yyyy = today.getFullYear().toString();
-    let mm = today.getMonth() + 1;
-    mm = mm < 10 ? "0" + mm.toString() : mm.toString();
-    let dd = today.getDate();
-    dd = dd < 10 ? "0" + dd.toString() : dd.toString();
-    console.log(dd);
-    if (moment().format("HH") == "00") {
-      return yyyy + mm + (today.getDate() - 1);
+    // let today = new Date(Date.now() - 45 * 60 * 1000);
+    // let yyyy = today.getFullYear().toString();
+    // let mm = today.getMonth() + 1;
+    // mm = mm < 10 ? "0" + mm.toString() : mm.toString();
+    // let dd = today.getDate();
+    // dd = dd < 10 ? "0" + dd.toString() : dd.toString();
+    // console.log(dd);
+    const today = moment().format("YYYYMMDD");
+    if (moment().hour() === 0) {
+      return moment(today).subtract(1, "days").format("YYYYMMDD");
     }
-    return yyyy + mm + dd;
+    console.log("today : ", today);
+    return today;
   };
 
   //초단기예보시간 - 예보시간은 각 30분, api제공시간은 45분
   const getBaseTime = () => {
-    // let hourDate = new Date(Date.now() - 45 * 60 * 1000);
-    // const currentTime = moment();
     var currentTime = moment();
     console.log("현재 시간:", currentTime.format("HH"));
     const oneHourAgo = currentTime.subtract(1, "hour");
     let formattedOneHourAgo = oneHourAgo.format("HH");
     console.log("현재 시간2:", formattedOneHourAgo);
-    // let hour = moment().format("HH")
-    // formattedOneHourAgo =
-    //   formattedOneHourAgo >= 10
-    //     ? formattedOneHourAgo
-    //     : "0" + formattedOneHourAgo;
     return formattedOneHourAgo + "" + "30";
   };
   console.log(getBaseTime());
