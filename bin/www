@@ -12,7 +12,10 @@ const PORT = 3000;
 
 app.use(
   cors({
-    origin: "https://web-react-wow-54ouz2lllulbggn.sel3.cloudtype.app",
+    origin: [
+      "https://web-react-wow-54ouz2lllulbggn.sel3.cloudtype.app",
+      "http://localhost:3000",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
