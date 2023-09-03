@@ -10,8 +10,6 @@ const TomorrowWeather = require("../server/TomorrowWeather");
 const TwentyfourWeather = require("../server/TwentyfourWeather");
 const PORT = 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(
   cors({
     origin: "https://web-react-wow-54ouz2lllulbggn.sel3.cloudtype.app",
@@ -19,6 +17,8 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.post("/api/nowweather", NowWeather);
 app.post("/api/tfweather", TwentyfourWeather);
